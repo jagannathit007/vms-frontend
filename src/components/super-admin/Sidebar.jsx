@@ -2,7 +2,7 @@ import React from 'react';
 import { FaBars, FaBuilding, FaTachometerAlt, FaSignOutAlt } from 'react-icons/fa';
 import { IoMdSettings } from 'react-icons/io';
 import Swal from 'sweetalert2';
-import "./SuperAdminSidebar.css"
+import "../../style/SuperAdminSidebar.css"
 import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, toggleSidebar, currentPage, setCurrentPage, isMobile }) => {

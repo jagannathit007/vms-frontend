@@ -14,12 +14,12 @@ function App() {
           <Route path='/admin/login' element={<LoginPage/>} />
           <Route path='/super-admin' element={<PrivateRoute><AdminPanelPage/></PrivateRoute>} />
 
-          <Route path='/' element={<CompanyLoginPage/>}/>
+          <Route path='/:companyName' element={<CompanyLoginPage/>}/>
           <Route path='/company' element={<CompanyPrivateRoute><CompanyPanelPage/></CompanyPrivateRoute>}/>
 
           <Route path="/visitor-form/:companyId" element={<VisitorForm />} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<CompanyLoginPage/>} />
         </Routes>
       </Router>
     </>

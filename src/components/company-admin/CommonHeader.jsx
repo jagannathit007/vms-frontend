@@ -19,9 +19,19 @@ const CommonHeader = ({ title, company, toggleSidebar, setCurrentPage }) => {
       confirmButtonText: "Yes, logout!",
     }).then((result) => {
       if (result.isConfirmed) {
-        localStorage.clear();
-        Swal.fire("Logged Out!", "", "success").then(() => {
-          window.location.reload();
+        localStorage.removeItem('companyToken');
+        localStorage.removeItem('company');
+        localStorage.removeItem('currentPage');
+        // Swal.fire("Logged Out!", "", "success")
+        Swal.fire({
+                            title: 'Logged Out!',
+                            text: 'You have been successfully logged out.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                          })
+        .then(() => {
+          // window.location.reload();
           navigate("/");
         });
       }

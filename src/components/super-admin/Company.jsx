@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { BaseUrl } from "../service/Uri";
+import { BaseUrl, FrontendUrl } from "../service/Uri";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import './SuperAdminCompany.css';
+import '../../style/SuperAdminCompany.css';
+import { FaCopy } from 'react-icons/fa';
 
 const Company = () => {
   const [search, setSearch] = useState('');
@@ -18,6 +19,8 @@ const Company = () => {
   const [updateData, setUpdateData] = useState({ name: '', logo: null, email: '', password: '', isActive: true });
   const [updateErrorMsg, setUpdateErrorMsg] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
+
 
 
   useEffect(() => {
@@ -121,7 +124,14 @@ const handleDelete = (id) => {
             Authorization: `Bearer ${token}`
           }
         });
-        Swal.fire('Deleted!', 'Company has been deleted.', 'success');
+        // Swal.fire('Deleted!', 'Company has been deleted.', 'success');
+        Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Company has been deleted.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                  })
         fetchCompanies();
       } catch (error) {
         console.error('Error deleting company:', error);
@@ -204,6 +214,10 @@ const handleUpdateSubmit = async (e) => {
   }
 };
 
+const generateCompanyUrl = (name) => {
+  return `${FrontendUrl}/${name.toLowerCase().replace(/\s+/g, '-')}`;
+};
+
   const filteredCompanies = companies.filter(c => {
     const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -258,7 +272,7 @@ const handleUpdateSubmit = async (e) => {
             <thead>
               <tr className="table-header">
                 <th scope="col" className="border-0 py-4 px-xxl-2">
-                  <div className="d-flex align-items-center">
+                  <div className="d-flex align-items-center justify-content-center">
                     <span className="fw-bold text-dark">Logo</span>
                   </div>
                 </th>
@@ -272,14 +286,14 @@ const handleUpdateSubmit = async (e) => {
                     <span className="fw-bold text-dark">Email</span>
                   </div>
                 </th>
-                <th scope="col" className="border-0 py-4 px-xxl-2">
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{width:"110px"}}>
                   <div className="d-flex align-items-center">
-                    <span className="fw-bold text-dark">Mobile Number</span>
+                    <span className="fw-bold text-dark">Mobile no.</span>
                   </div>
                 </th>
                 <th scope="col" className="border-0 py-4 px-xxl-2">
                   <div className="d-flex align-items-center">
-                    <span className="fw-bold text-dark">Contact Person Name</span>
+                    <span className="fw-bold text-dark">Person Name</span>
                   </div>
                 </th>
                 <th scope="col" className="border-0 py-4 px-xxl-2">
@@ -287,12 +301,17 @@ const handleUpdateSubmit = async (e) => {
                     <span className="fw-bold text-dark">Address</span>
                   </div>
                 </th>
-                <th scope="col" className="border-0 py-4 px-xxl-2">
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{width:"100px"}}>
+                  <div className="d-flex align-items-center">
+                    <span className="fw-bold text-dark">URL</span>
+                  </div>
+                </th>
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{width:"110px"}}>
                   <div className="d-flex align-items-center">
                     <span className="fw-bold text-dark">Status</span>
                   </div>
                 </th>
-                <th scope="col" className="text-end border-0 py-4 px-xxl-2">
+                <th scope="col" className="text-center border-0 py-4 px-xxl-2" style={{width:"180px"}}>
                   <span className="fw-bold text-dark">Action</span>
                 </th>
               </tr>
@@ -402,6 +421,39 @@ const handleUpdateSubmit = async (e) => {
                       </div>
                     </td>
                     <td className="border-0 py-4 px-xxl-2">
+                    <div className="url-container d-flex align-items-center gap-2">
+                      {copiedId === c._id ? (
+                        <span
+                          style={{
+                            fontSize: '13px',
+                            color: 'green',
+                            fontWeight: '600',
+                            backgroundColor: '#e6ffed',
+                            padding: '4px 10px',
+                            borderRadius: '8px',
+                            transition: 'opacity 0.3s ease',
+                          }}
+                        >
+                          Copied!
+                        </span>
+                      ) : (
+                        <span
+                          className="text-primary"
+                          style={{ fontSize: '13px', cursor: 'pointer' }}
+                          onClick={() => {
+                            const companyUrl = generateCompanyUrl(c.name);
+                            navigator.clipboard.writeText(companyUrl);
+                            setCopiedId(c._id);
+                            setTimeout(() => setCopiedId(null), 1000); // reset after 1 sec
+                          }}
+                        >
+                          🔗 Copy URL
+                        </span>
+                      )}
+                    </div>
+                  </td>
+
+                    <td className="border-0 py-4 px-xxl-2">
                       <span 
                         className={`badge status-badge ${c.isActive ? 'status-active' : 'status-inactive'}`}
                         style={{
@@ -448,7 +500,7 @@ const handleUpdateSubmit = async (e) => {
                             e.target.style.boxShadow = 'none';
                           }}
                         >
-                          Update
+                          Edit
                         </button>
                         <button
                           className="btn btn-sm action-btn delete-btn"
@@ -515,7 +567,7 @@ const handleUpdateSubmit = async (e) => {
     <div className="modal-dialog modal-dialog-centered">
       <form className="modal-content shadow rounded-4 overflow-hidden" onSubmit={handleUpdateSubmit}>
         <div className="modal-header bg-primary text-white">
-          <h5 className="modal-title fw-semibold">Update Company</h5>
+          <h5 className="modal-title fw-semibold">Edit Company</h5>
           <button type="button" className="btn-close btn-close-white" onClick={() => setShowUpdateModal(false)}></button>
         </div>
         <div className="modal-body px-4 py-3">
@@ -566,7 +618,6 @@ const handleUpdateSubmit = async (e) => {
     </div>
   </div>
 )}
-
 
 {showAddModal && (
   <div className="modal show d-block fade" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
@@ -625,8 +676,6 @@ const handleUpdateSubmit = async (e) => {
     </div>
   </div>
 )}
-
-      
     </div>
     </>
   );

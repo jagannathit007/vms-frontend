@@ -128,7 +128,7 @@ const totalPages = Math.ceil(filteredVisitors.length / itemsPerPage);
       </div>
 
       {/* Visitors Table */}
-      <div className="card border-0 shadow-sm">
+      <div className="card border-0">
         <div className="card-body p-0">
           {loading ? (
             <div className="text-center py-5">

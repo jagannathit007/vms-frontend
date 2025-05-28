@@ -46,8 +46,15 @@ const AdminHeader = ({ title, toggleSidebar, isMobile ,setCurrentPage}) => {
           onClick={() => setDropdownOpen(!dropdownOpen)}
           style={{ cursor: 'pointer' }}
         >
-          <FaUserCircle size={28} className="me-2" />
-          <span className='d-none d-sm-block'>{admin?.emailId}</span>
+          <FaUserCircle size={38} className="me-2" />
+          <div className='d-none d-sm-block'>
+                <h5 className="mb-0 fw-bold text-truncate" style={{ fontSize: '16px' }}>
+                  Super Admin
+                </h5>
+                <small style={{ color: 'rgba(0, 0, 0, 0.7)', fontSize: '12px' }}>
+                  {admin?.emailId}
+                </small>
+              </div>
         </div>
 
         {dropdownOpen && (

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import {
   FaEnvelope,
@@ -12,15 +12,30 @@ import {
 } from 'react-icons/fa';
 import { BaseUrl } from "../service/Uri";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './CompanyLogin.css';
+import '../../style/CompanyLogin.css';
 
 const CompanyLogin = () => {
+   const { companyName } = useParams(); 
   const [emailId, setEmailId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      try {
+        const res = await axios.get(`${BaseUrl}/company/slug-info/${companyName}`);
+        setCompanyInfo(res.data.data);
+      } catch (err) {
+        console.error("Error fetching company info:", err);
+      }
+    };
+
+    fetchCompanyInfo();
+  }, [companyName]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,11 +75,16 @@ const CompanyLogin = () => {
       <div className="login-card position-relative">
         <div className="login-header text-white text-center py-4 px-4">
           <div className="mb-3">
-            <div className="header-icon">
-              <FaBuilding size={28} className="text-white" />
-            </div>
+            {companyInfo?.logo ? (
+              <img src={`${BaseUrl}/${companyInfo.logo}`} alt="Logo" className="company-logo" style={{ height: 60,width:60,borderRadius:"50%" }} />
+            ) : (
+              <div className="header-icon">
+                {/* fallback icon */}
+                <FaBuilding size={28} className="text-white" />
+              </div>
+            )}
           </div>
-          <h3 className="mb-1 fw-bold">Company Portal</h3>
+          <h3 className="mb-1 fw-bold">{companyInfo?.name ? companyInfo.name : 'Company Portal'}</h3>
           <p className="mb-0 opacity-75">Sign in to access your dashboard</p>
           <div className="header-wave"></div>
         </div>

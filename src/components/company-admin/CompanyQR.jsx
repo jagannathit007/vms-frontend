@@ -1,10 +1,10 @@
 import { QRCodeCanvas } from 'qrcode.react';
-import { BaseUrl } from '../service/Uri';
+import { BaseUrl, FrontendUrl } from '../service/Uri';
 import { FaQrcode } from 'react-icons/fa';
 
 
 const CompanyQR = ({ companyId }) => {
-  const qrUrl = `http://localhost:5173/visitor-form/${companyId}`;
+  const qrUrl = `${FrontendUrl}/visitor-form/${companyId}`;
 
   return (
     <div className="card border-0 shadow-sm">

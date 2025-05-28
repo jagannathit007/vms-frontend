@@ -107,8 +107,9 @@
 
 @media (max-width: 767px) {
   .ca_visitor{
-    max-width: 96vw;
+    max-width: 94.3vw;
     overflow-x: auto;
+    margin: 0 auto;
     -webkit-overflow-scrolling: touch;
   }
   .ca_visitor table {
@@ -117,7 +118,8 @@
 }
 @media (max-width: 600px) {
   .ca_visitor{
-    max-width: 93vw;
+    max-width: 91vw;
+    margin: 0 auto;
   }
       .ca_visitor table {
         min-width: 650px;
@@ -125,6 +127,7 @@
 }
 @media (max-width: 400px) {
   .ca_visitor{
-    max-width: 90vw;
+    max-width: 89vw;
+    margin: 0 auto;
   }
 }

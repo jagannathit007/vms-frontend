@@ -24,7 +24,7 @@ const CompanyDashboard = ({setCurrentPage,toggleSidebar}) => {
       }
     };
     if (CompanyInfo?._id) fetchVisitorStats();
-  }, [CompanyInfo]);
+  }, []);
 
   return (
     <div className="container-fluid p-0">

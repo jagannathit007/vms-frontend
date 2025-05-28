@@ -151,8 +151,9 @@
 
   @media (max-width: 1399px) {
   .sa_company {
-    max-width: 80vw;
+    max-width: 78vw;
     overflow-x: auto;
+    margin: 0 auto;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -163,11 +164,25 @@
 
 @media (max-width: 1199px) {
   .sa_company {
-    max-width: 76vw;
+    max-width: 72vw;
+    margin: 0 auto;
   }
 }
 @media (max-width: 991px) {
   .sa_company {
     max-width: 96vw;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 767px) {
+  .sa_company {
+    max-width: 93vw;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 576px) {
+  .sa_company {
+    max-width: 90vw;
+    margin: 0 auto;
   }
 }
