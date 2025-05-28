@@ -4,7 +4,7 @@ import { FaQrcode } from 'react-icons/fa';
 
 
 const CompanyQR = ({ companyId }) => {
-  const qrUrl = `https://wg7b08rk-5173.inc1.devtunnels.ms/visitor-form/${companyId}`;
+  const qrUrl = `http://localhost:5173/visitor-form/${companyId}`;
 
   return (
     <div className="card border-0 shadow-sm">

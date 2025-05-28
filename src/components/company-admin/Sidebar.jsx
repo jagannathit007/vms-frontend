@@ -1,9 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { saveAs } from 'file-saver';
-import { QRCodeCanvas } from 'qrcode.react';
-import { FaBars, FaUserFriends, FaTachometerAlt, FaSignOutAlt, FaDownload, FaCalendarAlt, FaUsers, FaEye, FaQrcode } from 'react-icons/fa';
-import { BaseUrl } from "../service/Uri";
+import { useEffect } from 'react';
+import { FaBars, FaUserFriends, FaTachometerAlt, FaSignOutAlt} from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -28,6 +24,7 @@ const Sidebar = ({ isOpen, toggleSidebar, currentPage, setCurrentPage }) => {
       if (result.isConfirmed) {
         localStorage.removeItem('companyToken');
         localStorage.removeItem('company');
+        localStorage.removeItem('currentPage');
         Swal.fire({
           title: 'Logged Out!',
           text: 'You have been successfully logged out.',
@@ -35,7 +32,7 @@ const Sidebar = ({ isOpen, toggleSidebar, currentPage, setCurrentPage }) => {
           timer: 1500,
           showConfirmButton: false
         }).then(() => {
-          // window.location.reload();
+          window.location.reload();
           navigate('/');
         });
       }
