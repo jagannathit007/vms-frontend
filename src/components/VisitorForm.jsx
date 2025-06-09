@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
-import { FaUser, FaPhone, FaClipboardList, FaPaperPlane, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaUser, FaClipboardList, FaPaperPlane, FaCheckCircle, FaExclamationTriangle, FaPhoneAlt } from 'react-icons/fa';
 import { BaseUrl } from "./service/Uri";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -140,10 +140,10 @@ const VisitorForm = () => {
               </label>
               <div className="position-relative">
                 <div style={iconContainerStyle}>
-                  <FaPhone size={18} />
+                  <FaPhoneAlt size={18} />
                 </div>
                 <input 
-                  type="text" 
+                  type="tel" 
                   className="form-control"
                   style={inputStyle}
                   placeholder="Enter your mobile number" 
