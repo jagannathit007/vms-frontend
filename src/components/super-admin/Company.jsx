@@ -537,7 +537,7 @@ const generateCompanyUrl = (name) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center py-5 border-0">
+                  <td colSpan="9" className="text-center py-5 border-0">
                     <div 
                       className="no-data-container"
                       style={{
