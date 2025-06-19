@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaUser, FaClipboardList, FaPaperPlane, FaCheckCircle, FaExclamationTriangle, FaPhoneAlt } from 'react-icons/fa';
 import { BaseUrl } from "./service/Uri";
@@ -7,19 +7,45 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const VisitorForm = () => {
   const { companyId } = useParams();
-  const [formData, setFormData] = useState({ name: '', number: '', purpose: '' });
+  const [formData, setFormData] = useState({});
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [customFields, setCustomFields] = useState([]);
+
+useEffect(() => {
+  const fetchFields = async () => {
+    try {
+      const res = await axios.get(`${BaseUrl}/visitor/visitor-fields/form/${companyId}`);
+      if (res.data.status === 200) {
+        setCustomFields(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching dynamic fields", error);
+    }
+  };
+
+  fetchFields();
+}, [companyId]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      const res = await axios.post(`${BaseUrl}/visitor/create/${companyId}`, formData);
+      const dynamicData = { ...formData };
+customFields.forEach(field => {
+  if (!dynamicData[field.label]) {
+    dynamicData[field.label] = '';
+  }
+});
+
+const res = await axios.post(`${BaseUrl}/visitor/create/${companyId}`, dynamicData);
+
       if (res.data.status === 200) {
         setMessage("Visitor submitted successfully!");
-        setFormData({ name: '', number: '', purpose: '' });
+        setFormData({});
       } else {
         setMessage("Something went wrong.");
       }
@@ -61,7 +87,7 @@ const VisitorForm = () => {
   const inputStyle = {
     border: '2px solid #e9ecef',
     borderRadius: '15px',
-    padding: '15px 20px 15px 50px',
+    padding: '15px 20px 15px 20px',
     fontSize: '16px',
     transition: 'all 0.3s ease',
     background: 'rgba(255,255,255,0.9)'
@@ -110,82 +136,102 @@ const VisitorForm = () => {
 
           {/* Form Section */}
           <form onSubmit={handleSubmit}>
-            {/* Name Field */}
-            <div className="mb-4 position-relative">
-              <label className="form-label fw-semibold text-dark mb-2">
-                Full Name
-              </label>
-              <div className="position-relative">
-                <div style={iconContainerStyle}>
-                  <FaUser size={18} />
-                </div>
-                <input 
-                  type="text" 
-                  className="form-control"
-                  style={inputStyle}
-                  placeholder="Enter your full name" 
-                  value={formData.name} 
-                  onChange={e => setFormData({ ...formData, name: e.target.value })} 
-                  required 
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e9ecef'}
-                />
-              </div>
-            </div>
+  {customFields && customFields.length > 0 ? (
+    customFields.map((field) => (
+      <div className="mb-4 position-relative" key={field._id}>
+        <label className="form-label fw-semibold text-dark mb-2 text-capitalize">
+          {field.label}
+        </label>
+        <div className="position-relative">
+          <input
+            type={field.fieldType === "textarea" ? "text" : field.fieldType}
+            as={field.fieldType === "textarea" ? "textarea" : "input"}
+            className="form-control text-capitalize"
+            style={inputStyle}
+            placeholder={`Enter ${field.label.toLowerCase()}`}
+            value={formData[field.label] || ''}
+            onChange={(e) =>
+              setFormData({ ...formData, [field.label]: e.target.value })
+            }
+            required
+            onFocus={(e) => (e.target.style.borderColor = "#667eea")}
+            onBlur={(e) => (e.target.style.borderColor = "#e9ecef")}
+          />
+        </div>
+      </div>
+    ))
+  ) : (
+    <>
+      {/* Name Field */}
+      <div className="mb-4 position-relative">
+        <label className="form-label fw-semibold text-dark mb-2">
+          Full Name
+        </label>
+        <div className="position-relative">
+          <input 
+            type="text" 
+            className="form-control"
+            style={inputStyle}
+            placeholder="Enter your full name" 
+            value={formData.name || ''} 
+            onChange={e => setFormData({ ...formData, name: e.target.value })} 
+            required 
+            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+            onBlur={(e) => e.target.style.borderColor = '#e9ecef'}
+          />
+        </div>
+      </div>
 
-            {/* Mobile Number Field */}
-            <div className="mb-4 position-relative">
-              <label className="form-label fw-semibold text-dark mb-2">
-                Mobile Number
-              </label>
-              <div className="position-relative">
-                <div style={iconContainerStyle}>
-                  <FaPhoneAlt size={18} />
-                </div>
-                <input 
-                  type="tel" 
-                  className="form-control"
-                  style={inputStyle}
-                  placeholder="Enter your mobile number" 
-                  value={formData.number} 
-                  onChange={e => {
-                    const val = e.target.value;
-                    // Allow only digits
-                    if (/^\d{0,10}$/.test(val)) {
-                      setFormData({ ...formData, number: val });
-                    }
-                  }}
-                  required 
-                  maxLength={10}
-                  pattern="\d{10}"
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e9ecef'}
-                />
-              </div>
-            </div>
+      {/* Mobile Number Field */}
+      <div className="mb-4 position-relative">
+        <label className="form-label fw-semibold text-dark mb-2">
+          Mobile Number
+        </label>
+        <div className="position-relative">
+          <input 
+            type="tel" 
+            className="form-control"
+            style={inputStyle}
+            placeholder="Enter your mobile number" 
+            value={formData.number || ''} 
+            onChange={e => {
+              const val = e.target.value;
+              if (/^\d{0,10}$/.test(val)) {
+                setFormData({ ...formData, number: val });
+              }
+            }}
+            required 
+            maxLength={10}
+            pattern="\d{10}"
+            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+            onBlur={(e) => e.target.style.borderColor = '#e9ecef'}
+          />
+        </div>
+      </div>
 
-            {/* Purpose Field */}
-            <div className="mb-4 position-relative">
-              <label className="form-label fw-semibold text-dark mb-2">
-                Purpose of Visit
-              </label>
-              <div className="position-relative">
-                <div style={iconContainerStyle}>
-                  <FaClipboardList size={18} />
-                </div>
-                <input 
-                  type="text" 
-                  className="form-control"
-                  style={inputStyle}
-                  placeholder="Enter purpose of your visit" 
-                  value={formData.purpose} 
-                  onChange={e => setFormData({ ...formData, purpose: e.target.value })} 
-                  required 
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e9ecef'}
-                />
-              </div>
-            </div>
+      {/* Purpose Field */}
+      <div className="mb-4 position-relative">
+        <label className="form-label fw-semibold text-dark mb-2">
+          Purpose of Visit
+        </label>
+        <div className="position-relative">
+          <input 
+            type="text" 
+            className="form-control"
+            style={inputStyle}
+            placeholder="Enter purpose of your visit" 
+            value={formData.purpose || ''} 
+            onChange={e => setFormData({ ...formData, purpose: e.target.value })} 
+            required 
+            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+            onBlur={(e) => e.target.style.borderColor = '#e9ecef'}
+          />
+        </div>
+      </div>
+    </>
+  )}
+
+
 
             {/* Submit Button */}
             <button 
@@ -286,7 +332,7 @@ const VisitorForm = () => {
       </div>
 
       {/* Custom CSS for animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
