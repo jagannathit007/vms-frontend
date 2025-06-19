@@ -304,6 +304,7 @@ const res = await axios.post(`${BaseUrl}/visitor/create/${companyId}`, dynamicDa
           )}
         </div>
 
+
         {/* Decorative Elements */}
         <div 
           style={{
