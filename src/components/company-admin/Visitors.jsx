@@ -153,19 +153,39 @@ const Visitors = ({ toggleSidebar, setCurrentPage }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentVisitors.map((v, index) => (
-                    <tr key={index} style={{ borderBottom: '1px solid #f1f3f4' }}>
-                      {dynamicFieldKeys.map((key, idx) => (
-                        <td key={idx} className="py-3 px-3">
-                          {v.fields?.[key] || <span className="text-muted">—</span>}
-                        </td>
-                      ))}
-                      <td className="py-3 px-3 text-end">
-                        {new Date(v.createdAt).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+  {currentVisitors.map((v, index) => (
+    <tr key={index} style={{ borderBottom: '1px solid #f1f3f4' }}>
+      {dynamicFieldKeys.map((key, idx) => {
+        const val = v.fields?.[key];
+        const isImage = typeof val === "string" && val.startsWith("uploads/visitor-images/");
+
+        return (
+          <td key={idx} className="py-3 px-3">
+            {isImage ? (
+              <img
+                src={`${BaseUrl}/${val}`}
+                alt="Visitor"
+                style={{
+                  width: "60px",
+                  height: "60px",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                }}
+              />
+            ) : (
+              val || <span className="text-muted">—</span>
+            )}
+          </td>
+        );
+      })}
+      <td className="py-3 px-3 text-end">
+        {new Date(v.createdAt).toLocaleString()}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
               </table>
 
               {/* Pagination */}

@@ -122,7 +122,7 @@ const AddVisitorFieldModal = ({ show, onClose }) => {
                   <option value="number">Number</option>
                   <option value="date">Date</option>
                   <option value="textarea">Long Text</option>
-                  {/* <option value="file">Image</option> */}
+                  <option value="file">Image</option>
                 </select>
               </div>
 

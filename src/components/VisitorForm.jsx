@@ -75,30 +75,37 @@ const VisitorForm = () => {
         }
       }
     }
-    try {
-      const dynamicData = { ...formData };
-      customFields.forEach((field) => {
-        if (!dynamicData[field.label]) {
-          dynamicData[field.label] = "";
-        }
-      });
-      const res = await axios.post(
-        `${BaseUrl}/visitor/create/${companyId}`,
-        dynamicData
-      );
-      if (res.data.status === 200) {
-        setMessage("Visitor submitted successfully!");
-        setFormData({});
+   try {
+    const formPayload = new FormData();
+
+    customFields.forEach((field) => {
+      const value = formData[field.label];
+
+      if (field.fieldType === "image" && value instanceof File) {
+        // Append the actual file object
+        formPayload.append(field.label, value);
       } else {
-        setMessage("Something went wrong.");
+        formPayload.append(field.label, value || "");
       }
-    } catch (err) {
-      console.error(err);
-      setMessage("Error submitting form.");
-    } finally {
-      setIsSubmitting(false);
+    });
+
+    const res = await axios.post(`${BaseUrl}/visitor/create/${companyId}`, formPayload, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (res.data.status === 200) {
+      setMessage("Visitor submitted successfully!");
+      setFormData({});
+    } else {
+      setMessage("Something went wrong.");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setMessage("Error submitting form.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const containerStyle = {
     minHeight: "100vh",
@@ -179,7 +186,21 @@ const VisitorForm = () => {
                         onFocus={(e) => (e.target.style.borderColor = "#667eea")}
                         onBlur={(e) => (e.target.style.borderColor = "#e9ecef")}
                       />
-                    ) : (
+                    ) : field.fieldType === "file" ? (
+          <input
+            type="file"
+            accept="image/*"
+            className="form-control"
+            style={inputStyle}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                [field.label]: e.target.files[0],
+              })
+            }
+            required
+          />
+        ) : (
                       <input
                         type={field.fieldType}
                         className="form-control text-capitalize"
