@@ -1,10 +1,8 @@
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
-/* Login.css */
 
 .login-container {
   height: 100vh;
@@ -47,7 +45,7 @@
 }
 
 .glow-on-hover::after {
-  content: '';
+  content: "";
   background: linear-gradient(45deg, #6a11cb, #2575fc, #6a11cb);
   position: absolute;
   top: -50%;
@@ -78,19 +76,16 @@
     opacity: 1;
   }
 }
-  
-.company_model{
+
+.company_model {
   background-color: rgba(0, 0, 0, 0.603);
 }
-
-
 
 .swal2-popup {
   font-size: 1rem;
   border-radius: 10px;
 }
 
-/* styles.css */
 .cursor-pointer {
   cursor: pointer;
 }
@@ -104,30 +99,21 @@
   padding: 8px 16px;
 }
 
+.ca_visitor::-webkit-scrollbar {
+  height: 8px;
+}
 
-@media (max-width: 767px) {
-  .ca_visitor{
-    max-width: 94.3vw;
-    overflow-x: auto;
-    margin: 0 auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .ca_visitor table {
-    min-width: 800px; /* Adjust as needed based on table content */
-  }
+.ca_visitor::-webkit-scrollbar-thumb {
+  background-color: #f370a8;
+  border-radius: 10px;
 }
-@media (max-width: 600px) {
-  .ca_visitor{
-    max-width: 91vw;
-    margin: 0 auto;
-  }
-      .ca_visitor table {
-        min-width: 650px;
-    }
+
+.ca_visitor::-webkit-scrollbar-track {
+  background-color: #ffe5e5;
 }
-@media (max-width: 400px) {
-  .ca_visitor{
-    max-width: 89vw;
-    margin: 0 auto;
-  }
+
+/* Optional: Firefox support */
+.ca_visitor {
+  scrollbar-width: thin;
+  scrollbar-color: #f370a8 #ffe5e5;
 }

@@ -5,7 +5,7 @@ import Visitors from './Visitors';
 import ProfileSetting from './ProfileSetting';
 
 const CompanyPanel = () => {
-  const [isOpen, setIsOpen] = useState(window.innerWidth >= 992); // auto-close for small
+  const [isOpen, setIsOpen] = useState(window.innerWidth >= 992);
   const [currentPage, setCurrentPage] = useState(() => {
     return localStorage.getItem('currentPage') || 'Dashboard';
   });
@@ -34,7 +34,7 @@ const CompanyPanel = () => {
       case 'Dashboard':
         return <CompanyDashboard setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} />;
       case 'Visitors':
-        return <Visitors setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} />;
+        return <Visitors setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} isOpen={isOpen}/>;
       case 'Account Setting':
         return <ProfileSetting setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} />;
       default:
@@ -47,34 +47,12 @@ const CompanyPanel = () => {
   return (
     <>
       <div className="d-flex" style={{ background: '#f8f9fb', minHeight: '100vh' }}>
-        <Sidebar
-          isOpen={isOpen}
-          toggleSidebar={toggleSidebar}
-          currentPage={currentPage}
-          setCurrentPage={(name) => {
-            setCurrentPage(name);
-            if (isMobile) setIsOpen(false); // close sidebar on page change
-          }}
-        />
-        <div className="flex-grow-1 p-3" style={{ transition: 'margin-left 0.3s ease' }}>
-          {renderContent()}
-        </div>
+        <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} currentPage={currentPage} setCurrentPage={(name) => { setCurrentPage(name); if (isMobile) setIsOpen(false); }}/>
+        <div className="flex-grow-1 p-3" style={{ transition: 'margin-left 0.3s ease' }}>{renderContent()}</div>
       </div>
 
-      {/* Overlay for mobile when sidebar open */}
       {isMobile && isOpen && (
-        <div
-          onClick={toggleSidebar}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0,0,0,0.4)',
-            zIndex: 998,
-          }}
-        ></div>
+        <div onClick={toggleSidebar} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.4)', zIndex: 998, }}></div>
       )}
     </>
   );

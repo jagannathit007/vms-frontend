@@ -1,21 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import {
-  FaEnvelope,
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-  FaSignInAlt,
-  FaBuilding,
-  FaExclamationTriangle
-} from 'react-icons/fa';
+import {FaEnvelope,FaLock,FaEye,FaEyeSlash,FaSignInAlt,FaBuilding,FaExclamationTriangle} from 'react-icons/fa';
 import { BaseUrl } from "../service/Uri";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../style/CompanyLogin.css';
 
 const CompanyLogin = () => {
-   const { companyName } = useParams(); 
+  const { companyName } = useParams(); 
   const [emailId, setEmailId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -33,7 +25,6 @@ const CompanyLogin = () => {
         console.error("Error fetching company info:", err);
       }
     };
-
     fetchCompanyInfo();
   }, [companyName]);
 
@@ -43,13 +34,8 @@ const CompanyLogin = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${BaseUrl}/company/login`, {
-        email: emailId,
-        password: password
-      });
-
+      const response = await axios.post(`${BaseUrl}/company/login`, {email: emailId,password: password});
       const result = response.data;
-
       if (result.data) {
         localStorage.setItem('companyToken', result.data.token);
         localStorage.setItem('company', JSON.stringify(result.data.company));
@@ -68,10 +54,8 @@ const CompanyLogin = () => {
   return (
     <div className="login-container d-flex align-items-center justify-content-center p-4">
       <div className="login-overlay"></div>
-
       <div className="float-blob blob1"></div>
       <div className="float-blob blob2"></div>
-
       <div className="login-card position-relative">
         <div className="login-header text-white text-center py-4 px-4">
           <div className="mb-3">
@@ -79,7 +63,6 @@ const CompanyLogin = () => {
               <img src={`${BaseUrl}/${companyInfo.logo}`} alt="Logo" className="company-logo" style={{ height: 60,width:60,borderRadius:"50%" }} />
             ) : (
               <div className="header-icon">
-                {/* fallback icon */}
                 <FaBuilding size={28} className="text-white" />
               </div>
             )}
@@ -92,45 +75,19 @@ const CompanyLogin = () => {
         <div className="p-5 company_form">
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label fw-semibold text-dark mb-2">
-                Email Address
-              </label>
+              <label className="form-label fw-semibold text-dark mb-2">Email Address</label>
               <div className="custom-input-group input-group">
-                <span className="input-group-text text-primary px-3">
-                  <FaEnvelope size={18} />
-                </span>
-                <input
-                  type="email"
-                  className="form-control bg-transparent"
-                  placeholder="Enter your email address"
-                  value={emailId}
-                  onChange={(e) => setEmailId(e.target.value)}
-                  required
-                />
+                <span className="input-group-text text-primary px-3"><FaEnvelope size={18} /></span>
+                <input type="email" className="form-control bg-transparent" placeholder="Enter your email address" value={emailId} onChange={(e) => setEmailId(e.target.value)} required />
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="form-label fw-semibold text-dark mb-2">
-                Password
-              </label>
+              <label className="form-label fw-semibold text-dark mb-2">Password</label>
               <div className="custom-input-group input-group">
-                <span className="input-group-text text-primary px-3">
-                  <FaLock size={18} />
-                </span>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  className="form-control bg-transparent"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  className="btn bg-transparent border-0 text-muted px-3"
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
+                <span className="input-group-text text-primary px-3"><FaLock size={18} /></span>
+                <input type={showPassword ? 'text' : 'password'} className="form-control bg-transparent" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <button className="btn bg-transparent border-0 text-muted px-3" type="button" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
                 </button>
               </div>
@@ -144,11 +101,7 @@ const CompanyLogin = () => {
             )}
 
             <div className="d-grid">
-              <button
-                type="submit"
-                className="login-btn btn btn-lg text-white fw-semibold py-3"
-                disabled={loading}
-              >
+              <button type="submit" className="login-btn btn btn-lg text-white fw-semibold py-3" disabled={loading}>
                 {loading ? (
                   <>
                     <div className="spinner-border spinner-border-sm me-2" role="status">

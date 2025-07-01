@@ -21,6 +21,7 @@ const AdminHeader = ({ title, toggleSidebar, isMobile ,setCurrentPage}) => {
       if (result.isConfirmed) {
         localStorage.removeItem('adminToken');
         localStorage.removeItem('admin');
+        localStorage.removeItem('adminCurrentPage');
         Swal.fire({
           title: 'Logged Out!',
           text: 'You have been successfully logged out.',
@@ -41,44 +42,19 @@ const AdminHeader = ({ title, toggleSidebar, isMobile ,setCurrentPage}) => {
         <h3 className="mb-0">{title}</h3>
       </div>
       <div className="position-relative">
-        <div
-          className="d-flex align-items-center"
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          style={{ cursor: 'pointer' }}
-        >
+        <div className="d-flex align-items-center" onClick={() => setDropdownOpen(!dropdownOpen)} style={{ cursor: 'pointer' }}>
           <FaUserCircle size={38} className="me-2" />
           <div className='d-none d-sm-block'>
-                <h5 className="mb-0 fw-bold text-truncate" style={{ fontSize: '16px' }}>
-                  Super Admin
-                </h5>
-                <small style={{ color: 'rgba(0, 0, 0, 0.7)', fontSize: '12px' }}>
-                  {admin?.emailId}
-                </small>
-              </div>
+            <h5 className="mb-0 fw-bold text-truncate" style={{ fontSize: '16px' }}> Super Admin</h5>
+            <small style={{ color: 'rgba(0, 0, 0, 0.7)', fontSize: '12px' }}>{admin?.emailId} </small>
+          </div>
         </div>
-
         {dropdownOpen && (
-          <div
-            className="position-absolute end-0 mt-2 bg-white border rounded shadow-sm"
-            style={{ zIndex: 1000,width:"150px" }}
-          >
-            <div
-              className="px-3 py-2 border-bottom"
-              style={{ cursor: 'pointer' }}
-              onClick={() => {
-                setDropdownOpen(false);
-                setCurrentPage('Account Setting');
-              }}
-            >
+          <div className="position-absolute end-0 mt-2 bg-white border rounded shadow-sm" style={{ zIndex: 1000,width:"150px" }}>
+            <div className="px-3 py-2 border-bottom" style={{ cursor: 'pointer' }} onClick={() => { setDropdownOpen(false); setCurrentPage('Account Setting');}}>
               Account Setting
             </div>
-            <div
-              className="px-3 py-2"
-              style={{ cursor: 'pointer' }}
-              onClick={handleLogout}
-            >
-              Logout
-            </div>
+            <div className="px-3 py-2" style={{ cursor: 'pointer' }} onClick={handleLogout}> Logout</div>
           </div>
         )}
       </div>

@@ -5,9 +5,9 @@ import { BaseUrl, FrontendUrl } from "../service/Uri";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import '../../style/SuperAdminCompany.css';
-import { FaCopy } from 'react-icons/fa';
+import AddVisitorFieldModal from '../company-admin/AddVisitorFieldModal';
 
-const Company = () => {
+const Company = ({isOpen}) => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
   const [companies, setCompanies] = useState([]);
@@ -20,14 +20,21 @@ const Company = () => {
   const [updateErrorMsg, setUpdateErrorMsg] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
-
-
+  const [showFieldModal, setShowFieldModal] = useState(false);
+  const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
 
   useEffect(() => {
     fetchCompanies();
   }, []);
 
-  const fetchCompanies = async () => {
+useEffect(() => {
+  const handleResize = () => setIsMobile(window.innerWidth < 992);
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
+
+const fetchCompanies = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
@@ -42,11 +49,10 @@ const Company = () => {
     } finally {
       setLoading(false);
     }
-  };
+};
 
 const handleFormChange = (e) => {
   const { name, value, type, checked, files } = e.target;
-
   if (name === 'mobile') {
     const numericValue = value.replace(/\D/g, '');
     if (numericValue.length <= 10) {
@@ -78,16 +84,13 @@ const handleSubmit = async (e) => {
       for (const key in formData) {
         form.append(key, formData[key]);
       }
-
       const response = await axios.post(`${BaseUrl}/company/create`, form, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
-
       if (response.data && response.data.data) {
-      // document.getElementById('closeModalBtn').click();
       setErrorMsg('')
       fetchCompanies();
       setShowAddModal(false)
@@ -120,11 +123,8 @@ const handleDelete = (id) => {
       try {
         const token = localStorage.getItem('adminToken');
         await axios.delete(`${BaseUrl}/company/delete/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}`}
         });
-        // Swal.fire('Deleted!', 'Company has been deleted.', 'success');
         Swal.fire({
                     title: 'Deleted!',
                     text: 'Company has been deleted.',
@@ -146,7 +146,7 @@ const handleUpdateClick = (company) => {
   setCurrentCompany(company);
   setUpdateData({
     name: company.name,
-    logo: null, // Will only change if user selects new one
+    logo: null,
     email: company.email,
     mobile: company.mobile,
     pname: company.pname,
@@ -184,7 +184,6 @@ const handleUpdateChange = (e) => {
 const handleUpdateSubmit = async (e) => {
   e.preventDefault();
   if (!currentCompany) return;
-
   try {
     const token = localStorage.getItem('adminToken');
     const form = new FormData();
@@ -193,14 +192,12 @@ const handleUpdateSubmit = async (e) => {
         form.append(key, updateData[key]);
       }
     }
-
     const res = await axios.put(`${BaseUrl}/company/update/${currentCompany._id}`, form, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'
       }
     });
-
     if (res.data && res.data.data) {
       fetchCompanies();
       setShowUpdateModal(false);
@@ -222,12 +219,10 @@ const generateCompanyUrl = (name) => {
     const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.email.toLowerCase().includes(search.toLowerCase());
-
     const matchesStatus =
       filter === 'All' ||
       (filter === 'Active' && c.isActive === true) ||
       (filter === 'Inactive' && c.isActive === false);
-
     return matchesSearch && matchesStatus;
   });
 
@@ -235,9 +230,7 @@ const generateCompanyUrl = (name) => {
     <>
     <div>
       <div className="d-flex justify-content-end align-items-center mb-3">
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-          + Add Company
-        </button>
+        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}> + Add Company</button>
       </div>
 
       <div className="mb-3 d-flex align-items-center justify-content-between">
@@ -253,7 +246,7 @@ const generateCompanyUrl = (name) => {
           ))}
         </div> */}
         <div className="me-2">
-          <select className="form-select" style={{ width: '180px' }} value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <select className="form-select company_select_drop" value={filter} onChange={(e) => setFilter(e.target.value)}>
             <option value="All">All Companies</option>
             <option value="Active">Active Companies</option>
             <option value="Inactive">Inactive Companies</option>
@@ -267,41 +260,41 @@ const generateCompanyUrl = (name) => {
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <div className="table-responsive sa_company">
+        <div className=" sa_company"  style={{ maxWidth: isMobile ? 'calc(100vw - 32px)' : isOpen ? 'calc(100vw - 240px)' : 'calc(100vw - 80px)', overflowX: 'scroll',}}>
           <table className="table mb-0 table-hover align-middle shadow-lg border-0 rounded-4 overflow-scroll modern-table">
             <thead>
               <tr className="table-header">
-                <th scope="col" className="border-0 py-4 px-xxl-2">
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{minWidth:"90px"}}>
                   <div className="d-flex align-items-center justify-content-center">
                     <span className="fw-bold text-dark">Logo</span>
                   </div>
                 </th>
-                <th scope="col" className="border-0 py-4 px-xxl-2">
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{minWidth:"150px"}}>
                   <div className="d-flex align-items-center">
                     <span className="fw-bold text-dark">Company Name</span>
                   </div>
                 </th>
-                <th scope="col" className="border-0 py-4 px-xxl-2">
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{minWidth:"160px"}}>
                   <div className="d-flex align-items-center">
                     <span className="fw-bold text-dark">Email</span>
                   </div>
                 </th>
                 <th scope="col" className="border-0 py-4 px-xxl-2" style={{width:"110px"}}>
                   <div className="d-flex align-items-center">
-                    <span className="fw-bold text-dark">Mobile no.</span>
+                    <span className="fw-bold text-dark">Mobile no</span>
                   </div>
                 </th>
-                <th scope="col" className="border-0 py-4 px-xxl-2">
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{minWidth:"150px"}}>
                   <div className="d-flex align-items-center">
                     <span className="fw-bold text-dark">Person Name</span>
                   </div>
                 </th>
-                <th scope="col" className="border-0 py-4 px-xxl-2">
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{minWidth:"200px"}}>
                   <div className="d-flex align-items-center">
                     <span className="fw-bold text-dark">Address</span>
                   </div>
                 </th>
-                <th scope="col" className="border-0 py-4 px-xxl-2" style={{width:"100px"}}>
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{minWidth:"100px"}}>
                   <div className="d-flex align-items-center">
                     <span className="fw-bold text-dark">URL</span>
                   </div>
@@ -309,6 +302,11 @@ const generateCompanyUrl = (name) => {
                 <th scope="col" className="border-0 py-4 px-xxl-2" style={{width:"110px"}}>
                   <div className="d-flex align-items-center">
                     <span className="fw-bold text-dark">Status</span>
+                  </div>
+                </th>
+                <th scope="col" className="border-0 py-4 px-xxl-2" style={{width:"110px"}}>
+                  <div className="d-flex align-items-center">
+                    <span className="fw-bold text-dark">Customize Form</span>
                   </div>
                 </th>
                 <th scope="col" className="text-center border-0 py-4 px-xxl-2" style={{width:"180px"}}>
@@ -319,238 +317,82 @@ const generateCompanyUrl = (name) => {
             <tbody>
               {filteredCompanies.length > 0 ? (
                 filteredCompanies.map((c, index) => (
-                  <tr 
-                    key={c._id} 
-                    className="table-row"
-                    style={{
-                      animationDelay: `${index * 0.1}s`,
-                    }}
-                  >
+                  <tr key={c._id} className="table-row" style={{ animationDelay: `${index * 0.1}s`,}}>
                     <td className="border-0 py-4 px-xxl-2">
                       <div className="logo-container">
-                        <img
-                          src={`${BaseUrl}/${c.logo}`}
-                          alt={c.name}
-                          className="company-logo"
-                          style={{
-                            width: '60px',
-                            height: '60px',
-                            objectFit: 'cover',
-                            borderRadius: '12px',
-                            border: '2px solid #f8f9fa',
-                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                            transition: 'all 0.3s ease',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.transform = 'scale(1.1)';
-                            e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.15)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.transform = 'scale(1)';
-                            e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-                          }}
+                        <img src={`${BaseUrl}/${c.logo}`} alt={c.name} className="company-logo"
+                          style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '12px', border: '2px solid #f8f9fa', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', transition: 'all 0.3s ease',}}
+                          onMouseEnter={(e) => { e.target.style.transform = 'scale(1.1)'; e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.15)';}}
+                          onMouseLeave={(e) => { e.target.style.transform = 'scale(1)'; e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';}}
                         />
                       </div>
                     </td>
                     <td className="border-0 py-4 px-xxl-2">
                       <div className="company-name">
-                        <span 
-                          className="fw-semibold text-dark"
-                          style={{
-                            fontSize: '15px',
-                            letterSpacing: '0.3px',
-                          }}
-                        >
-                          {c.name}
-                        </span>
+                        <span className="fw-semibold text-dark" style={{ fontSize: '15px', letterSpacing: '0.3px',}}> {c.name}</span>
                       </div>
                     </td>
                     <td className="border-0 py-4 px-xxl-2">
                       <div className="email-container">
-                        <span 
-                          className="text-muted"
-                          style={{
-                            fontSize: '14px',
-                            wordBreak: 'break-word',
-                          }}
-                        >
-                          {c.email}
-                        </span>
+                        <span className="text-muted" style={{ fontSize: '14px', wordBreak: 'break-word',}}> {c.email}</span>
                       </div>
                     </td>
                     <td className="border-0 py-4 px-xxl-2">
                       <div className="mobile-container">
-                        <span 
-                          className="text-dark"
-                          style={{
-                            fontSize: '14px',
-                            fontFamily: 'monospace',
-                          }}
-                        >
-                          {c.mobile}
-                        </span>
+                        <span className="text-dark" style={{ fontSize: '14px', fontFamily: 'monospace', }}> {c.mobile}</span>
                       </div>
                     </td>
                     <td className="border-0 py-4 px-xxl-2">
                       <div className="person-name">
-                        <span 
-                          className="text-dark"
-                          style={{
-                            fontSize: '14px',
-                          }}
-                        >
-                          {c.pname}
-                        </span>
+                        <span className="text-dark" style={{ fontSize: '14px', }}> {c.pname}</span>
                       </div>
                     </td>
                     <td className="border-0 py-4 px-xxl-2">
                       <div className="address-container">
-                        <span 
-                          className="text-muted"
-                          style={{
-                            fontSize: '13px',
-                            lineHeight: '1.4',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                          }}
-                        >
-                          {c.address}
-                        </span>
+                        <span className="text-muted" style={{ fontSize: '13px', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', }}> {c.address}</span>
                       </div>
                     </td>
                     <td className="border-0 py-4 px-xxl-2">
-                    <div className="url-container d-flex align-items-center gap-2">
-                      {copiedId === c._id ? (
-                        <span
-                          style={{
-                            fontSize: '13px',
-                            color: 'green',
-                            fontWeight: '600',
-                            backgroundColor: '#e6ffed',
-                            padding: '4px 10px',
-                            borderRadius: '8px',
-                            transition: 'opacity 0.3s ease',
-                          }}
-                        >
-                          Copied!
-                        </span>
-                      ) : (
-                        <span
-                          className="text-primary"
-                          style={{ fontSize: '13px', cursor: 'pointer' }}
-                          onClick={() => {
-                            const companyUrl = generateCompanyUrl(c.name);
-                            navigator.clipboard.writeText(companyUrl);
-                            setCopiedId(c._id);
-                            setTimeout(() => setCopiedId(null), 1000); // reset after 1 sec
-                          }}
-                        >
-                          🔗 Copy URL
-                        </span>
-                      )}
-                    </div>
-                  </td>
-
+                      <div className="url-container d-flex align-items-center gap-2">
+                        {copiedId === c._id ? (
+                          <span style={{ fontSize: '13px', color: 'green', fontWeight: '600', backgroundColor: '#e6ffed', padding: '4px 10px', borderRadius: '8px', transition: 'opacity 0.3s ease',}}> Copied!</span>
+                        ) : (
+                          <span className="text-primary" style={{ fontSize: '13px', cursor: 'pointer' }}
+                            onClick={() => { const companyUrl = generateCompanyUrl(c.name); navigator.clipboard.writeText(companyUrl);
+                              setCopiedId(c._id); setTimeout(() => setCopiedId(null), 1000);}}> 🔗 Copy URL</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="border-0 py-4 px-xxl-2">
-                      <span 
-                        className={`badge status-badge ${c.isActive ? 'status-active' : 'status-inactive'}`}
-                        style={{
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          padding: '6px 12px',
-                          borderRadius: '20px',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          backgroundColor: c.isActive ? '#d4edda' : '#f8d7da',
-                          color: c.isActive ? '#155724' : '#721c24',
-                          border: `1px solid ${c.isActive ? '#c3e6cb' : '#f5c6cb'}`,
-                        }}
-                      >
-                        {c.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                      <span className={`badge status-badge ${c.isActive ? 'status-active' : 'status-inactive'}`}
+                        style={{ fontSize: '12px', fontWeight: '600', padding: '6px 12px', borderRadius: '20px',
+                          textTransform: 'uppercase', letterSpacing: '0.5px', backgroundColor: c.isActive ? '#d4edda' : '#f8d7da',
+                          color: c.isActive ? '#155724' : '#721c24', border: `1px solid ${c.isActive ? '#c3e6cb' : '#f5c6cb'}`,}}> {c.isActive ? 'Active' : 'Inactive'}</span>
+                    </td>
+                    <td className="border-0 py-4 px-xxl-2">
+                      <button className="btn btn-light fw-medium px-4 py-1 shadow-sm" onClick={() => { setSelectedCompanyId(c._id); setShowFieldModal(true); }} style={{ borderRadius: '15px' }}>Customize</button>
                     </td>
                     <td className="text-end border-0 py-4 px-xxl-2">
                       <div className="action-buttons d-flex justify-content-end gap-2">
-                        <button
-                          className="btn btn-sm action-btn update-btn"
-                          onClick={() => handleUpdateClick(c)}
-                          style={{
-                            backgroundColor: '#fff3cd',
-                            color: '#856404',
-                            border: '1px solid #ffeaa7',
-                            borderRadius: '8px',
-                            padding: '6px 16px',
-                            fontSize: '13px',
-                            fontWeight: '600',
-                            transition: 'all 0.2s ease',
-                            textTransform: 'capitalize',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = '#ffc107';
-                            e.target.style.color = '#ffffff';
-                            e.target.style.transform = 'translateY(-1px)';
-                            e.target.style.boxShadow = '0 4px 8px rgba(255, 193, 7, 0.3)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = '#fff3cd';
-                            e.target.style.color = '#856404';
-                            e.target.style.transform = 'translateY(0)';
-                            e.target.style.boxShadow = 'none';
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn btn-sm action-btn delete-btn"
-                          onClick={() => handleDelete(c._id)}
-                          style={{
-                            backgroundColor: '#f8d7da',
-                            color: '#721c24',
-                            border: '1px solid #f5c6cb',
-                            borderRadius: '8px',
-                            padding: '6px 16px',
-                            fontSize: '13px',
-                            fontWeight: '600',
-                            transition: 'all 0.2s ease',
-                            textTransform: 'capitalize',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = '#dc3545';
-                            e.target.style.color = '#ffffff';
-                            e.target.style.transform = 'translateY(-1px)';
-                            e.target.style.boxShadow = '0 4px 8px rgba(220, 53, 69, 0.3)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = '#f8d7da';
-                            e.target.style.color = '#721c24';
-                            e.target.style.transform = 'translateY(0)';
-                            e.target.style.boxShadow = 'none';
-                          }}
-                        >
-                          Delete
-                        </button>
+                        <button className="btn btn-sm action-btn update-btn" onClick={() => handleUpdateClick(c)}
+                          style={{ backgroundColor: '#fff3cd', color: '#856404', border: '1px solid #ffeaa7', borderRadius: '8px', padding: '6px 16px', fontSize: '13px', fontWeight: '600', transition: 'all 0.2s ease', textTransform: 'capitalize',}}
+                          onMouseEnter={(e) => { e.target.style.backgroundColor = '#ffc107'; e.target.style.color = '#ffffff'; e.target.style.transform = 'translateY(-1px)'; e.target.style.boxShadow = '0 4px 8px rgba(255, 193, 7, 0.3)';}}
+                          onMouseLeave={(e) => { e.target.style.backgroundColor = '#fff3cd'; e.target.style.color = '#856404'; e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = 'none';}}
+                        > Edit</button>
+                        <button className="btn btn-sm action-btn delete-btn" onClick={() => handleDelete(c._id)}
+                          style={{ backgroundColor: '#f8d7da', color: '#721c24', border: '1px solid #f5c6cb', borderRadius: '8px', padding: '6px 16px', fontSize: '13px', fontWeight: '600', transition: 'all 0.2s ease', textTransform: 'capitalize',}}
+                          onMouseEnter={(e) => { e.target.style.backgroundColor = '#dc3545'; e.target.style.color = '#ffffff'; e.target.style.transform = 'translateY(-1px)'; e.target.style.boxShadow = '0 4px 8px rgba(220, 53, 69, 0.3)';}}
+                          onMouseLeave={(e) => { e.target.style.backgroundColor = '#f8d7da'; e.target.style.color = '#721c24'; e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = 'none'; }}
+                        > Delete</button>
                       </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" className="text-center py-5 border-0">
-                    <div 
-                      className="no-data-container"
-                      style={{
-                        padding: '40px 20px',
-                        color: '#6c757d',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '12px',
-                        margin: '20px',
-                      }}
-                    >
-                      <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>
-                        📊
-                      </div>
+                  <td colSpan="10" className="text-center py-5 border-0">
+                    <div className="no-data-container" style={{ padding: '40px 20px', color: '#6c757d', backgroundColor: '#f8f9fa', borderRadius: '12px', margin: '20px', }} >
+                      <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }}>📊</div>
                       <h5 style={{ marginBottom: '8px', color: '#495057' }}>No companies found</h5>
                       <p style={{ margin: 0, fontSize: '14px' }}>Try adjusting your search criteria</p>
                     </div>
@@ -561,6 +403,8 @@ const generateCompanyUrl = (name) => {
           </table>
         </div>
       )}
+
+      <AddVisitorFieldModal show={showFieldModal} onClose={() => setShowFieldModal(false)} companyId={selectedCompanyId} />
 
 {showUpdateModal && (
   <div className="modal show d-block company_model" tabIndex="-1" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>

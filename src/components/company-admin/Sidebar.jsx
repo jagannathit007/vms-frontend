@@ -9,7 +9,7 @@ import { IoMdSettings } from "react-icons/io";
 const Sidebar = ({ isOpen, toggleSidebar, currentPage, setCurrentPage }) => {
     const navigate = useNavigate();
   
-    const handleItemClick = (name) => {
+const handleItemClick = (name) => {
   if (name === 'Logout') {
     Swal.fire({
       title: 'Are you sure?',
@@ -32,7 +32,6 @@ const Sidebar = ({ isOpen, toggleSidebar, currentPage, setCurrentPage }) => {
           timer: 1500,
           showConfirmButton: false
         }).then(() => {
-          // window.location.reload();
           navigate('/');
         });
       }
@@ -48,22 +47,9 @@ const sidebarItems = [
   { name: 'Logout', icon: <FaSignOutAlt /> },
 ];
 
-
-  const CompanyInfo = JSON.parse(localStorage.getItem('company'));
+const CompanyInfo = JSON.parse(localStorage.getItem('company'));
 const isMobile = window.innerWidth < 992;
-
-const sidebarStyle = {
-  minHeight: '100vh',
-  width: isOpen ? (isMobile ? '260px' : '280px') : (isMobile ? '0' : '70px'),
-  transition: 'all 0.3s ease-in-out',
-  background: 'linear-gradient(rgb(26, 26, 46) 0%, rgb(22, 33, 62) 50%, rgb(15, 52, 96) 100%)',
-  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-  position: isMobile ? 'fixed' : 'relative',
-  zIndex: 999,
-  top: 0,
-  left: 0,
-  overflowX: 'hidden',
-};
+const sidebarStyle = { minHeight: '100vh', width: isOpen ? (isMobile ? '260px' : '280px') : (isMobile ? '0' : '70px'), transition: 'all 0.3s ease-in-out', background: 'linear-gradient(rgb(26, 26, 46) 0%, rgb(22, 33, 62) 50%, rgb(15, 52, 96) 100%)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)', position: isMobile ? 'fixed' : 'relative', zIndex: 999, top: 0, left: 0, overflowX: 'hidden',};
 
 useEffect(() => {
   const handleOutsideClick = (e) => {
@@ -75,32 +61,15 @@ useEffect(() => {
   return () => document.removeEventListener('click', handleOutsideClick);
 }, [isMobile, isOpen]);
 
-
-  const overlayStyle = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(255,255,255,0.05)',
-    backdropFilter: 'blur(10px)',
-    zIndex: 1
-  };
+  const overlayStyle = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)', zIndex: 1};
 
   return (
     <div className="sidebar-container d-flex flex-column text-white p-lg-2" style={sidebarStyle}>
       <div style={overlayStyle}></div>
       <div className='m-2 m-lg-0' style={{ position: 'relative', zIndex: 2 }}>
-        <div 
-          className="mb-4 d-flex align-items-center justify-content-between p-2 rounded" 
+        <div className="mb-4 d-flex align-items-center justify-content-between p-2 rounded" 
           onClick={toggleSidebar} 
-          style={{ 
-            cursor: 'pointer',
-            background: 'rgba(255,255,255,0.1)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            transition: 'all 0.3s ease'
-          }}
+          style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', transition: 'all 0.3s ease'}}
           onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
           onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.1)'}
         >
@@ -110,31 +79,11 @@ useEffect(() => {
         </div>
 
         {sidebarItems.map((item) => (
-          <div
-            key={item.name}
-            onClick={() => {
-  handleItemClick(item.name);
-  if (window.innerWidth < 992) toggleSidebar();
-}}
-
+          <div key={item.name} onClick={() => { handleItemClick(item.name); if (window.innerWidth < 992) toggleSidebar(); }}
             className={`mb-2 d-flex align-items-center p-3 rounded ${currentPage === item.name ? 'bg-white text-primary shadow-sm' : ''}`}
-            style={{ 
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              background: currentPage === item.name ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(10px)'
-            }}
-            onMouseEnter={(e) => {
-              if (currentPage !== item.name) {
-                e.target.style.background = 'rgba(255,255,255,0.2)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage !== item.name) {
-                e.target.style.background = 'rgba(255,255,255,0.1)';
-              }
-            }}
+            style={{ cursor: 'pointer', transition: 'all 0.3s ease', background: currentPage === item.name ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)' }}
+            onMouseEnter={(e) => { if (currentPage !== item.name) { e.target.style.background = 'rgba(255,255,255,0.2)';} }}
+            onMouseLeave={(e) => { if (currentPage !== item.name) { e.target.style.background = 'rgba(255,255,255,0.1)';}}}
           >
             <span style={{ fontSize: '18px', minWidth: '20px' }}>{item.icon}</span>
             {isOpen && <span className="ms-3 fw-medium">{item.name}</span>}

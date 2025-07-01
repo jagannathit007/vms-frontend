@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BaseUrl } from '../service/Uri';
 import CompanyQR from './CompanyQR';
-import { FaCalendarAlt, FaTachometerAlt, FaUsers } from 'react-icons/fa';
 import CommonHeader from './CommonHeader';
 
 const CompanyDashboard = ({setCurrentPage,toggleSidebar}) => {
@@ -28,12 +27,7 @@ const CompanyDashboard = ({setCurrentPage,toggleSidebar}) => {
 
   return (
     <div className="container-fluid p-0">
-      <CommonHeader 
-        title="Dashboard" 
-        company={CompanyInfo} 
-        toggleSidebar={toggleSidebar} 
-        setCurrentPage={setCurrentPage} 
-      />
+      <CommonHeader title="Dashboard" company={CompanyInfo} toggleSidebar={toggleSidebar} setCurrentPage={setCurrentPage} />
 
       <div className="row g-4 mt-3">
         <div className="col-md-6">

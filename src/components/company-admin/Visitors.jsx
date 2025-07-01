@@ -7,14 +7,23 @@ import CommonHeader from './CommonHeader';
 import AddVisitorFieldModal from './AddVisitorFieldModal';
 import { MdDashboardCustomize } from "react-icons/md";
 
-const Visitors = ({ toggleSidebar, setCurrentPage }) => {
+const Visitors = ({ toggleSidebar, setCurrentPage ,isOpen}) => {
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
   const [visitors, setVisitors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPages] = useState(1);
   const [showFieldModal, setShowFieldModal] = useState(false);
+  const [showDeletedFields, setShowDeletedFields] = useState(false);
+  const [activeFields, setActiveFields] = useState([]);
   const itemsPerPage = 6;
   const company = JSON.parse(localStorage.getItem('company'));
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
+
+useEffect(() => {
+  const handleResize = () => setIsMobile(window.innerWidth < 992);
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
 
   const fetchVisitors = async () => {
     try {
@@ -22,7 +31,6 @@ const Visitors = ({ toggleSidebar, setCurrentPage }) => {
       const res = await axios.get(`${BaseUrl}/visitor/company-visitor`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
       if (res.data.status === 200) {
         setVisitors(res.data.data);
       } else {
@@ -35,8 +43,20 @@ const Visitors = ({ toggleSidebar, setCurrentPage }) => {
     }
   };
 
+  const fetchActiveFields = async () => {
+  try {
+    const res = await axios.get(`${BaseUrl}/visitor/visitor-fields/form/${company._id}`);
+    if (res.data.status === 200) {
+      setActiveFields(res.data.data.map(field => field.label));
+    }
+  } catch (err) {
+    console.error("Error fetching active visitor fields:", err);
+  }
+};
+
   useEffect(() => {
     fetchVisitors();
+    fetchActiveFields();
   }, []);
 
   const filteredVisitors = visitors.filter(v => {
@@ -54,10 +74,10 @@ const Visitors = ({ toggleSidebar, setCurrentPage }) => {
 
   // 🔑 Get all unique dynamic field keys
   const dynamicFieldKeys = Array.from(
-    new Set(
-      visitors.flatMap(v => v.fields ? Object.keys(v.fields) : [])
-    )
-  );
+  new Set(
+    visitors.flatMap(v => v.fields ? Object.keys(v.fields) : [])
+  )
+).filter(k => showDeletedFields || activeFields.includes(k)); // 👈 filter applied here
 
   // 📁 Download CSV with dynamic fields
   const downloadCSV = () => {
@@ -74,14 +94,8 @@ const Visitors = ({ toggleSidebar, setCurrentPage }) => {
 
   return (
     <div className="container-fluid p-0">
-      <CommonHeader 
-        title="Visitors" 
-        company={company} 
-        toggleSidebar={toggleSidebar} 
-        setCurrentPage={setCurrentPage} 
-      />
+      <CommonHeader title="Visitors" company={company} toggleSidebar={toggleSidebar} setCurrentPage={setCurrentPage} />
 
-      {/* Header */}
       <div className="card border-0 shadow-sm my-4" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
         <div className="card-body p-4 d-sm-flex justify-content-between align-items-center">
           <div>
@@ -89,13 +103,10 @@ const Visitors = ({ toggleSidebar, setCurrentPage }) => {
             <p className="text-white-50 mb-0">Track and manage your visitors efficiently</p>
           </div>
           <div className="d-flex flex-wrap gap-2 mt-3 mt-sm-0">
-            <button className="btn btn-light fw-medium px-4 py-2 shadow-sm" onClick={() => setShowFieldModal(true)} style={{ borderRadius: '15px' }}>
+            {/* <button className="btn btn-light fw-medium px-4 py-2 shadow-sm" onClick={() => setShowFieldModal(true)} style={{ borderRadius: '15px' }}>
               <MdDashboardCustomize className='mb-1'/> Customize Form
-            </button>
-            <button className="btn btn-light fw-medium px-4 py-2 shadow-sm" onClick={downloadCSV} style={{ borderRadius: '15px' }}>
-              <FaDownload className="me-2" />
-              Download CSV
-            </button>
+            </button> */}
+            <button className="btn btn-light fw-medium px-4 py-2 shadow-sm" onClick={downloadCSV} style={{ borderRadius: '15px' }}><FaDownload className="me-2" /> Download CSV</button>
           </div>
         </div>
       </div>
@@ -140,56 +151,62 @@ const Visitors = ({ toggleSidebar, setCurrentPage }) => {
               <p className="mt-3 text-muted">Loading visitors...</p>
             </div>
           ) : (
-            <div className="table-responsive ca_visitor">
+            <div className="table-responsive ca_visitor" style={{ maxWidth: isMobile ? 'calc(100vw - 32px)' : isOpen ? 'calc(100vw - 312px)' : 'calc(100vw - 123px)', overflowX: 'scroll',}}>
+              {/* <div className="d-flex justify-content-between align-items-center p-3">
+                <div className="form-check form-switch ms-3 ms-auto rounded-2 py-2 ps-5 pe-2" style={{ background: 'linear-gradient(135deg, rgb(240, 147, 251) 0%, rgb(245, 87, 108) 100%)' }}>
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="showDeletedFields"
+                    checked={showDeletedFields}
+                    onChange={() => setShowDeletedFields(!showDeletedFields)}
+                  />
+                  <label className="form-check-label text-white fw-semibold" htmlFor="showDeletedFields">
+                    Show Deleted Fields
+                  </label>
+                </div>
+              </div> */}
+
               <table className="table table-hover mb-0">
                 <thead style={{ background: 'linear-gradient(45deg, #f8f9ff, #e3f2fd)' }}>
                   <tr>
                     {dynamicFieldKeys.map((key, i) => (
-                      <th key={i} className="fw-bold text-primary px-3 py-3">
+                      <th key={i} className={`fw-bold px-3 py-3 ${activeFields.includes(key) ? 'text-primary' : 'text-secondary'}`}>
                         {key.charAt(0).toUpperCase() + key.slice(1)}
                       </th>
                     ))}
-                    <th className="fw-bold text-primary px-3 py-3 text-end">Date/Time</th>
+                    {dynamicFieldKeys.some(k => showDeletedFields || activeFields.includes(k)) && (
+                    <th className="fw-bold text-primary px-3 py-3 text-end" style={{minWidth:"210px"}}>Date/Time</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
-  {currentVisitors.map((v, index) => (
-    <tr key={index} style={{ borderBottom: '1px solid #f1f3f4' }}>
-      {dynamicFieldKeys.map((key, idx) => {
-        const val = v.fields?.[key];
-        const isImage = typeof val === "string" && val.startsWith("uploads/visitor-images/");
-
-        return (
-          <td key={idx} className="py-3 px-3">
-            {isImage ? (
-              <img
-                src={`${BaseUrl}/${val}`}
-                alt="Visitor"
-                style={{
-                  width: "60px",
-                  height: "60px",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-                }}
-              />
-            ) : (
-              val || <span className="text-muted">—</span>
-            )}
-          </td>
-        );
-      })}
-      <td className="py-3 px-3 text-end">
-        {new Date(v.createdAt).toLocaleString()}
-      </td>
-    </tr>
-  ))}
-</tbody>
-
+                  {currentVisitors.map((v, index) => !Object.keys(v.fields || {}).some(k => showDeletedFields || dynamicFieldKeys.includes(k)) ? '' : (
+                    
+                    <tr key={index} style={{ borderBottom: '1px solid #f1f3f4' }}>
+                      {dynamicFieldKeys.map((key, idx) => {
+                        const val = v.fields?.[key];
+                        const isImage = typeof val === "string" && val.startsWith("uploads/visitor-images/");
+                        return (
+                          <td key={idx} className={`py-3 px-3 ${activeFields.includes(key) ? 'text-dark' : 'text-secondary'}`}>
+                            {isImage ? (
+                              <img src={`${BaseUrl}/${val}`} alt="Visitor" style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "10px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}/>
+                            ) : (
+                              val || <span className="text-muted">—</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                      
+                      <td className="py-3 px-3 text-end">
+                        {new Date(v.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
 
-              {/* Pagination */}
-              {filteredVisitors.length >= itemsPerPage && (
+              {filteredVisitors.length >= itemsPerPage && activeFields.length > 0 && (
                 <div className="d-flex justify-content-center align-items-center py-4">
                   <button className="btn btn-outline-primary me-2" onClick={() => setCurrentPages(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
                     Prev
@@ -201,7 +218,7 @@ const Visitors = ({ toggleSidebar, setCurrentPage }) => {
                 </div>
               )}
 
-              {filteredVisitors.length === 0 && (
+              {(filteredVisitors.length === 0 || !dynamicFieldKeys.some(k => showDeletedFields || activeFields.includes(k))) && (
                 <div className="text-center py-5">
                   <FaEye size={48} className="text-muted mb-3" />
                   <p className="text-muted">No visitors found for the selected criteria</p>

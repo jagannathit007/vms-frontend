@@ -138,7 +138,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -147,7 +148,8 @@
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
   25% {
@@ -158,15 +160,14 @@
   }
 }
 
-@media (max-width:450px) {
-  .company_form{
+@media (max-width: 450px) {
+  .company_form {
     padding: 8px !important;
   }
   .login-btn {
-  font-size: 18px;
-}
-.login-container {
-  padding: 16px !important;
-}
-
+    font-size: 18px;
+  }
+  .login-container {
+    padding: 16px !important;
+  }
 }
