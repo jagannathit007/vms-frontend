@@ -125,7 +125,7 @@ const handlePasswordSubmit = async (e) => {
               </div>
               <div className="mb-3">
                 <label className="form-label">Logo (optional)</label>
-                <input className="form-control" type="file" name="logo" onChange={handleChange} />
+                <input className="form-control" type="file" accept="image/*" name="logo" onChange={handleChange} />
                 {company.logo && (
                   <div className="mt-2">
                     <img src={`${BaseUrl}/${company.logo}`} alt="Current Logo" style={{ width: '100px', height: '100px', objectFit: 'cover' }} />

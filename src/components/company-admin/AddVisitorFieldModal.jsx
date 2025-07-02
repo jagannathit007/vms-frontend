@@ -52,6 +52,15 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 });
 
+useEffect(() => {
+  if (fieldType === 'number') {
+    setOtpRequired(otpRequired || false);
+setMinValue(minValue || '');
+setMaxValue(maxValue || '');
+  }
+}, [fieldType]);
+
+
 const handleAddOrUpdate = async () => {
   if (!label) {
     Toast.fire({ icon: 'error', title: 'Label is required' });
@@ -65,6 +74,12 @@ const handleAddOrUpdate = async () => {
       return;
     }
   }
+  const existingOtpField = fields.find(
+  (f) => f.otpRequired && f._id !== editId
+);
+
+const finalOtpRequired = !!otpRequired && !existingOtpField;
+
   const payload = {
     companyId,
     label,
@@ -75,7 +90,7 @@ const handleAddOrUpdate = async () => {
         min: minValue ? Number(minValue) : undefined,
         max: maxValue ? Number(maxValue) : undefined,
       },
-      otpRequired,
+      otpRequired:finalOtpRequired,
     }),
   };
 
@@ -100,6 +115,7 @@ const handleAddOrUpdate = async () => {
     Toast.fire({icon: 'success',title: editId ? 'Field updated successfully!' : 'Field added successfully!',});
     setLabel('');
     setFieldType('text');
+    setOtpRequired(false);
     setMinValue('');
     setMaxValue('');
     fetchFields();
@@ -200,10 +216,10 @@ const handleAddOrUpdate = async () => {
               {fieldType === 'number' && (
                 <>
                   <div className="col-md-2">
-                    <input type="number" className="form-control" placeholder="Min" value={minValue} onChange={(e) => setMinValue(e.target.value)} />
+                    <input type="number" className="form-control" placeholder="Min" disabled={otpRequired} value={minValue} onChange={(e) => setMinValue(e.target.value)} />
                   </div>
                   <div className="col-md-2">
-                    <input type="number" className="form-control" placeholder="Max" value={maxValue} onChange={(e) => setMaxValue(e.target.value)} />
+                    <input type="number" className="form-control" placeholder="Max" disabled={otpRequired} value={maxValue} onChange={(e) => setMaxValue(e.target.value)} />
                   </div>
 
                   {!fields.some((f) => f.otpRequired && f._id !== editId) && (
