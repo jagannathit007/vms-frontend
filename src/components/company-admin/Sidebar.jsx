@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { FaBars, FaUserFriends, FaTachometerAlt, FaSignOutAlt} from 'react-icons/fa';
+import { FaBars, FaUserFriends, FaTachometerAlt, FaSignOutAlt, FaUserTie} from 'react-icons/fa';
+import { GiPoliceOfficerHead } from "react-icons/gi";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -43,6 +44,8 @@ const handleItemClick = (name) => {
 const sidebarItems = [
   { name: 'Dashboard', icon: <FaTachometerAlt /> },
   { name: 'Visitors', icon: <FaUserFriends /> },
+  { name: 'Members', icon: <FaUserTie /> },
+  { name: 'Watchmen', icon: <GiPoliceOfficerHead /> },
   { name: 'Account Setting', icon: <IoMdSettings /> },
   { name: 'Logout', icon: <FaSignOutAlt /> },
 ];

@@ -3,6 +3,8 @@ import Sidebar from './Sidebar';
 import CompanyDashboard from './CompanyDashboard';
 import Visitors from './Visitors';
 import ProfileSetting from './ProfileSetting';
+import CompanyMember from './CompanyMember';
+import CompanyWatchmen from './CompanyWatchmen';
 
 const CompanyPanel = () => {
   const [isOpen, setIsOpen] = useState(window.innerWidth >= 992);
@@ -35,6 +37,10 @@ const CompanyPanel = () => {
         return <CompanyDashboard setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} />;
       case 'Visitors':
         return <Visitors setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} isOpen={isOpen}/>;
+      case 'Members':
+        return <CompanyMember setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} isOpen={isOpen}/>;
+      case 'Watchmen':
+        return <CompanyWatchmen setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} isOpen={isOpen}/>;
       case 'Account Setting':
         return <ProfileSetting setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} />;
       default:
