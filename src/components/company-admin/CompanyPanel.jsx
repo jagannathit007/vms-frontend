@@ -37,8 +37,8 @@ const CompanyPanel = () => {
         return <CompanyDashboard setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} />;
       case 'Visitors':
         return <Visitors setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} isOpen={isOpen}/>;
-      case 'Members':
-        return <CompanyMember setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} isOpen={isOpen}/>;
+      // case 'Members':
+      //   return <CompanyMember setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} isOpen={isOpen}/>;
       case 'Watchmen':
         return <CompanyWatchmen setCurrentPage={setCurrentPage} toggleSidebar={toggleSidebar} isOpen={isOpen}/>;
       case 'Account Setting':

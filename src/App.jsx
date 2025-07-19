@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate, } from 'react-router-
 import { LoginPage , AdminPanelPage, CompanyLoginPage, CompanyPanelPage } from './pages';
 import {CompanyPrivateRoute, PrivateRoute} from './components/PrivateRoute';
 import VisitorForm from './components/VisitorForm';
+import WatchmenLogin from './components/watchmen/watchmenLogin';
+import WatchmenDashboard from './components/watchmen/WatchmenDashboard';
 
 function App() {
 
@@ -20,6 +22,9 @@ function App() {
           <Route path="/visitor-form/:companyId" element={<VisitorForm />} />
 
           <Route path="*" element={<CompanyLoginPage/>} />
+
+          <Route path='/watchmen/login' element={<WatchmenLogin/>}/>
+          <Route path='/watchmen' element={<WatchmenDashboard/>}/>
         </Routes>
       </Router>
     </>

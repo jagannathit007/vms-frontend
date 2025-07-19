@@ -44,7 +44,7 @@ const handleItemClick = (name) => {
 const sidebarItems = [
   { name: 'Dashboard', icon: <FaTachometerAlt /> },
   { name: 'Visitors', icon: <FaUserFriends /> },
-  { name: 'Members', icon: <FaUserTie /> },
+  // { name: 'Members', icon: <FaUserTie /> },
   { name: 'Watchmen', icon: <GiPoliceOfficerHead /> },
   { name: 'Account Setting', icon: <IoMdSettings /> },
   { name: 'Logout', icon: <FaSignOutAlt /> },
